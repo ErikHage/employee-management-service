@@ -1,0 +1,21 @@
+{  
+   "employeeId":"%s",
+   "recordVersion":%d,
+   "firstName":"%s",
+   "lastName":"%s",
+   "phone":"%s",
+   "email":"%s",
+   "title":"%s",
+   "address":{  
+      "addressId":"%s",
+      "street":"%s",
+      "city":"%s",
+      "state":"%s",
+      "zipCode":"%s",
+      "country":"%s"
+   },
+   "birthDate":[%s],
+   "startDate":[%s],
+   "wage":%f,
+   "active":%b
+}
