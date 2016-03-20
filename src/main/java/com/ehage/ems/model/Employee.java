@@ -118,8 +118,9 @@ public class Employee {
 		this.employeeId = employeeId;
 	}
 	
-	public void setRecordVersion(int recordVersion) {
+	public Employee setRecordVersion(int recordVersion) {
 		this.recordVersion = recordVersion;
+		return this;
 	}
 	
 	public void setFirstName(String firstName) {
