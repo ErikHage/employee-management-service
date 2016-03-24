@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ehage.ems.config.Constants;
 import com.ehage.ems.config.Routes;
 import com.ehage.ems.exception.NoSuchRecordException;
+import com.ehage.ems.exception.RestExceptionMessage;
 import com.ehage.ems.model.Employee;
 import com.ehage.ems.service.EmployeeService;
 
 @RestController
-@EnableAutoConfiguration
 public class EmployeeRestController {
 	
 	private static final Log logger = LogFactory.getLog(EmployeeRestController.class);
@@ -79,8 +78,9 @@ public class EmployeeRestController {
 	
 	@ExceptionHandler(NoSuchRecordException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public NoSuchRecordException handle(NoSuchRecordException ex) {		
-		return ex;
+	public RestExceptionMessage handle(NoSuchRecordException ex) {		
+		RestExceptionMessage message = new RestExceptionMessage(ex.getMessage(), ex.getId());		
+		return message;
 	}
 	
 	

@@ -3,62 +3,60 @@ package com.ehage.ems.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import com.ehage.ems.exception.NoSuchRecordException;
 import com.ehage.ems.model.Employee;
 
 @Repository
 public class EmployeeLocalStorage implements EmployeeDao {
 	
-	private static final Map<String, Employee> employeeMap
-		= new HashMap<String, Employee>();
-	
-	private static final AtomicLong employeeIdSequence
-		= new AtomicLong(0);		
+	private static final Map<String, Optional<Employee>> employeeMap
+		= new HashMap<String, Optional<Employee>>();	
 	
 	@Override
-	public Employee create(Employee employee) {
-		String employeeId = String.valueOf(employeeIdSequence.getAndIncrement());
-		employee.setEmployeeId(employeeId);
+	public Optional<Employee> create(Employee employee) {
 		employee.setRecordVersion(1);
-		employeeMap.put(employeeId, employee);
-		return employeeMap.get(employeeId);
+		employeeMap.put(employee.getEmployeeId(), Optional.of(employee));
+		return employeeMap.get(employee.getEmployeeId());
 	}
 
 	@Override
 	public List<Employee> readAll() {
-		return (List<Employee>) employeeMap.values();
+		return employeeMap.values()
+				.parallelStream()
+				.map(optionalEmployee -> optionalEmployee.get())
+				.collect(Collectors.toList()
+		);
 	}
 	
 	@Override
-	public Employee readById(String id) {
-		if(employeeMap.containsKey(id)) {
-			return employeeMap.get(id);
-		} else {
-			throw new NoSuchRecordException("No employee found with id = " + id);
-		}
+	public Optional<Employee> readById(String id) {
+		return employeeMap.get(id);
 	}
 
 	@Override
-	public Employee update(Employee employee) {
-		if(employeeMap.containsKey(employee.getEmployeeId())) {
-			employee.setRecordVersion(employee.getRecordVersion()+1);
-			employeeMap.put(employee.getEmployeeId(), employee);
-			return employeeMap.get(employee.getEmployeeId());
-		} else {
-			throw new NoSuchRecordException("No employee found with id = " + employee.getEmployeeId());
-		}
+	public Optional<Employee> update(Employee employee) {
+		Optional<Employee> employeeOpt = 
+				employeeMap.get(employee.getEmployeeId())
+				.map(e -> employee.setRecordVersion(e.getRecordVersion()+1));
+		
+		employeeMap.put(employee.getEmployeeId(), employeeOpt);		
+		
+		return employeeMap.get(employee.getEmployeeId());
 	}
 
 	@Override
 	public void deleteById(String employeeId) {
-		if(employeeMap.containsKey(employeeId)) {
-			employeeMap.remove(employeeId);
-		} else {
-			throw new NoSuchRecordException("No employee found with id = " + employeeId);
-		}	}
+		employeeMap.get(employeeId).ifPresent(emp -> employeeMap.remove(employeeId));
+		
+	}
+	
+	protected void deleteAll() {
+		employeeMap.clear();
+	}
+		
 
 }
