@@ -2,7 +2,6 @@ package com.ehage.ems.dao;
 
 import static org.junit.Assert.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ehage.ems.helper.EMSTestHelper;
-import com.ehage.ems.model.Address;
 import com.ehage.ems.model.Employee;
 
 public class TestEmployeeLocalStorage {
