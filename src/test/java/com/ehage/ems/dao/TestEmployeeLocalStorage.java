@@ -23,12 +23,11 @@ public class TestEmployeeLocalStorage {
 	
 	@After
 	public void cleanUp() {
-		storage.deleteAll();
-		
+		storage.deleteAll();		
 	}
 	
 	@Test
-	public void testCreate() {
+	public void testCreate_GivenEmployee_ExpectOptionalEmployeePresent() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		Optional<Employee> eopt1 = storage.create(e1);		
 		Employee eout1 = eopt1.get();
@@ -36,7 +35,7 @@ public class TestEmployeeLocalStorage {
 	}
 
 	@Test
-	public void testReadAll() {
+	public void testReadAll_ExpectListOfEmployees() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		storage.create(e1);	
 		Employee e2 = EMSTestHelper.getEmployee("T2");	
@@ -48,7 +47,7 @@ public class TestEmployeeLocalStorage {
 	}
 
 	@Test
-	public void testReadById() {
+	public void testReadById_GievenValidId_ExpectEmployee() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		storage.create(e1);	
 				
@@ -56,9 +55,21 @@ public class TestEmployeeLocalStorage {
 		assertTrue(eopt1.isPresent());
 		assertEquals(eopt1.get().getEmployeeId(), "T1");
 	}
+	
+	@Test
+	public void testReadById_GivenNullId_ExpectOptionalEmpty() {
+		Optional<Employee> eopt1 = storage.readById(null); 
+		assertFalse(eopt1.isPresent());
+	}	
 
 	@Test
-	public void testUpdate() {
+	public void testReadById_GivenInvalidId_ExpectOptionalEmpty() {
+		Optional<Employee> eopt1 = storage.readById("T1"); 
+		assertFalse(eopt1.isPresent());
+	}	
+	
+	@Test
+	public void testUpdate_GivenExistingEmployee_ExpectOptionalEmployeePresent() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");
 		Employee e2 = EMSTestHelper.getEmployee("T1");
 		e2.setFirstName("ErikUpdated");
@@ -69,19 +80,25 @@ public class TestEmployeeLocalStorage {
 		
 		Optional<Employee> eopt2 = storage.update(e2);
 		Employee eout2 = eopt2.get();		
-		assertEquals(eout2.getFirstName(), "ErikUpdated");
-		
+		assertEquals(eout2.getFirstName(), "ErikUpdated");		
 	}
+	
+	@Test
+	public void testUpdate_GivenEmployeeDoesntExist_ExpectOptionalEmployeeEmpty() {
+		Employee e2 = EMSTestHelper.getEmployee("T1");
+		e2.setFirstName("ErikUpdated");
+		
+		Optional<Employee> eopt2 = storage.update(e2);
+		assertFalse(eopt2.isPresent());		
+	}	
 
 	@Test
-	public void testDeleteById() {
+	public void testDeleteById_GivenValidId_ExpectSuccess() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		storage.create(e1);
 		assertEquals(storage.readAll().size(), 1);
 		
 		storage.deleteById("T1");
-		assertEquals(storage.readAll().size(), 0);
-		
+		assertEquals(storage.readAll().size(), 0);		
 	}
-
 }

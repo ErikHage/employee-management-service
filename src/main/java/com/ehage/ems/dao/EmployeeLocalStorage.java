@@ -34,14 +34,23 @@ public class EmployeeLocalStorage implements EmployeeDao {
 	
 	@Override
 	public Optional<Employee> readById(String id) {
-		return employeeMap.get(id);
+		return employeeMap.values()
+				.parallelStream()
+				.filter((opt) -> opt.isPresent() 
+								 && opt.get().getEmployeeId() == id)
+				.findAny()
+				.orElse(Optional.empty());				
 	}
 
 	@Override
-	public Optional<Employee> update(Employee employee) {
+	public Optional<Employee> update(Employee employee) {		
 		Optional<Employee> employeeOpt = 
-				employeeMap.get(employee.getEmployeeId())
-				.map(e -> employee.setRecordVersion(e.getRecordVersion()+1));
+				employeeMap.values()
+					.parallelStream()
+					.filter((opt) -> opt.isPresent()
+							&& opt.get().getEmployeeId() == employee.getEmployeeId())					
+					.map(e -> employee.setRecordVersion(e.get().getRecordVersion()+1))
+					.findAny();	
 		
 		employeeMap.put(employee.getEmployeeId(), employeeOpt);		
 		
@@ -50,8 +59,7 @@ public class EmployeeLocalStorage implements EmployeeDao {
 
 	@Override
 	public void deleteById(String employeeId) {
-		employeeMap.get(employeeId).ifPresent(emp -> employeeMap.remove(employeeId));
-		
+		employeeMap.get(employeeId).ifPresent(emp -> employeeMap.remove(employeeId));		
 	}
 	
 	protected void deleteAll() {
