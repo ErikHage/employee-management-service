@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.ehage.ems.model.Employee;
 
 @Repository
-public class EmployeeLocalStorage implements EmployeeDao {
+public class EmployeeLocalDao implements EmployeeDao {
 	
 	private static final Map<String, Optional<Employee>> employeeMap
 		= new HashMap<String, Optional<Employee>>();	
@@ -24,10 +24,9 @@ public class EmployeeLocalStorage implements EmployeeDao {
 	}
 
 	@Override
-	public List<Employee> readAll() {
+	public List<Optional<Employee>> readAll() {
 		return employeeMap.values()
 				.parallelStream()
-				.map(optionalEmployee -> optionalEmployee.get())
 				.collect(Collectors.toList()
 		);
 	}

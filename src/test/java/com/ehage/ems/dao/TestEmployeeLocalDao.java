@@ -12,13 +12,13 @@ import org.junit.Test;
 import com.ehage.ems.helper.EMSTestHelper;
 import com.ehage.ems.model.Employee;
 
-public class TestEmployeeLocalStorage {
+public class TestEmployeeLocalDao {
 
-	private EmployeeLocalStorage storage;
+	private EmployeeLocalDao storage;
 	
 	@Before
 	public void setUp() {
-		storage = new EmployeeLocalStorage();
+		storage = new EmployeeLocalDao();
 	}
 	
 	@After
@@ -41,7 +41,7 @@ public class TestEmployeeLocalStorage {
 		Employee e2 = EMSTestHelper.getEmployee("T2");	
 		storage.create(e2);		
 				
-		List<Employee> list = storage.readAll();
+		List<Optional<Employee>> list = storage.readAll();
 		
 		assertEquals(list.size(), 2);		
 	}

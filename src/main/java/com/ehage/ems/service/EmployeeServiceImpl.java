@@ -2,6 +2,7 @@ package com.ehage.ems.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public List<Employee> readAll() {
-		return employeeDao.readAll();
+		return employeeDao.readAll()
+				.parallelStream()
+				.filter(optEmployee -> optEmployee.get() != null)
+				.map(optEmployee -> optEmployee.get())
+				.collect(Collectors.toList());
 	}
 
 	@Override

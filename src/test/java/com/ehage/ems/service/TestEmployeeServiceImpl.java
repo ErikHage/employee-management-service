@@ -3,7 +3,7 @@ package com.ehage.ems.service;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,6 +73,7 @@ public class TestEmployeeServiceImpl {
 		fail("Expected NoSuchRecordException, but wasn't thrown");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testReadAll() {
 		Employee emp1 = EMSTestHelper.getEmployee("T1");
@@ -80,14 +81,14 @@ public class TestEmployeeServiceImpl {
 		Employee emp2 = EMSTestHelper.getEmployee("T2");
 		emp2.setRecordVersion(1);
 		
-		List<Employee> list = new ArrayList<Employee>();
-		list.add(emp1);
-		list.add(emp2);
+		List<Optional<Employee>> list = 
+				Arrays.asList(new Optional[] {Optional.of(emp1), Optional.of(emp2)});
 		
 		when(mockDao.readAll()).thenReturn(list);
 		
+		List<Employee> listIn = Arrays.asList(new Employee[] {emp1, emp2});
 		List<Employee> listOut = employeeService.readAll();
-		assertEquals(list, listOut);
+		assertEquals(listIn, listOut);
 		
 		verify(mockDao, times(1)).readAll();
 		verifyNoMoreInteractions(mockDao);
