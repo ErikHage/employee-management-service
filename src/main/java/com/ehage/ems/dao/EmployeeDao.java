@@ -9,8 +9,8 @@ public interface EmployeeDao {
 
 	public Optional<Employee> create(Employee employee);
 	public Optional<Employee> readById(String id);
-	public List<Optional<Employee>> readAll();
+	public List<Employee> readAll();
 	public Optional<Employee> update(Employee employee);
-	public void deleteById(String employeeId);
+	public boolean deleteById(String employeeId);
 	
 }

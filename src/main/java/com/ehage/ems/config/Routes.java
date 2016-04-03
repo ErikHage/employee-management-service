@@ -1,6 +1,6 @@
 package com.ehage.ems.config;
 
-public class Routes {
+public abstract class Routes {
 
 	public static final String MAIN_PAGE = "/";
 	

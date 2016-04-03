@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ehage.ems.config.Constants;
 import com.ehage.ems.config.Routes;
-import com.ehage.ems.exception.NoSuchRecordException;
+import com.ehage.ems.exception.PersistenceException;
 import com.ehage.ems.exception.RestExceptionMessage;
 import com.ehage.ems.model.Employee;
 import com.ehage.ems.service.EmployeeService;
@@ -76,9 +76,9 @@ public class EmployeeRestController {
 		employeeService.deleteById(employeeId);
 	}
 	
-	@ExceptionHandler(NoSuchRecordException.class)
+	@ExceptionHandler(PersistenceException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public RestExceptionMessage handle(NoSuchRecordException ex) {		
+	public RestExceptionMessage handle(PersistenceException ex) {		
 		RestExceptionMessage message = new RestExceptionMessage(ex.getMessage(), ex.getId());		
 		return message;
 	}

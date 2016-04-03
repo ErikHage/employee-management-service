@@ -2,7 +2,6 @@ package com.ehage.ems.dao;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.After;
@@ -40,14 +39,17 @@ public class TestEmployeeLocalDao {
 		storage.create(e1);	
 		Employee e2 = EMSTestHelper.getEmployee("T2");	
 		storage.create(e2);		
-				
-		List<Optional<Employee>> list = storage.readAll();
 		
-		assertEquals(list.size(), 2);		
+		assertEquals(storage.readAll().size(), 2);		
 	}
 
 	@Test
-	public void testReadById_GievenValidId_ExpectEmployee() {
+	public void testReadAll_ExpectEmptyListOfEmployees() {		
+		assertEquals(storage.readAll().size(), 0);		
+	}
+	
+	@Test
+	public void testReadById_GivenValidId_ExpectEmployee() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		storage.create(e1);	
 				
@@ -93,12 +95,17 @@ public class TestEmployeeLocalDao {
 	}	
 
 	@Test
-	public void testDeleteById_GivenValidId_ExpectSuccess() {
+	public void testDeleteById_GivenValidId_ExpectReturnTrue() {
 		Employee e1 = EMSTestHelper.getEmployee("T1");	
 		storage.create(e1);
 		assertEquals(storage.readAll().size(), 1);
 		
-		storage.deleteById("T1");
+		assertTrue(storage.deleteById("T1"));		
 		assertEquals(storage.readAll().size(), 0);		
+	}
+	
+	@Test
+	public void testDeleteById_GivenInvalidId_ExpectReturnFalse() {				
+		assertFalse(storage.deleteById("T1"));		
 	}
 }

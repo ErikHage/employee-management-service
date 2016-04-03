@@ -13,18 +13,18 @@ import com.ehage.ems.model.Employee;
 @Repository
 public class EmployeeLocalDao implements EmployeeDao {
 	
-	private static final Map<String, Optional<Employee>> employeeMap
-		= new HashMap<String, Optional<Employee>>();	
+	private static final Map<String, Employee> employeeMap
+		= new HashMap<String, Employee>();	
 	
 	@Override
 	public Optional<Employee> create(Employee employee) {
 		employee.setRecordVersion(1);
-		employeeMap.put(employee.getEmployeeId(), Optional.of(employee));
-		return employeeMap.get(employee.getEmployeeId());
+		employeeMap.put(employee.getEmployeeId(), employee);
+		return Optional.of(employeeMap.get(employee.getEmployeeId()));
 	}
 
 	@Override
-	public List<Optional<Employee>> readAll() {
+	public List<Employee> readAll() {
 		return employeeMap.values()
 				.parallelStream()
 				.collect(Collectors.toList()
@@ -35,10 +35,8 @@ public class EmployeeLocalDao implements EmployeeDao {
 	public Optional<Employee> readById(String id) {
 		return employeeMap.values()
 				.parallelStream()
-				.filter((opt) -> opt.isPresent() 
-								 && opt.get().getEmployeeId() == id)
-				.findAny()
-				.orElse(Optional.empty());				
+				.filter((emp) -> emp.getEmployeeId() == id)
+				.findAny();			
 	}
 
 	@Override
@@ -46,19 +44,24 @@ public class EmployeeLocalDao implements EmployeeDao {
 		Optional<Employee> employeeOpt = 
 				employeeMap.values()
 					.parallelStream()
-					.filter((opt) -> opt.isPresent()
-							&& opt.get().getEmployeeId() == employee.getEmployeeId())					
-					.map(e -> employee.setRecordVersion(e.get().getRecordVersion()+1))
+					.filter((emp) -> emp.getEmployeeId() == employee.getEmployeeId())					
+					.map((emp) -> employee.setRecordVersion(emp.getRecordVersion()+1))
 					.findAny();	
 		
-		employeeMap.put(employee.getEmployeeId(), employeeOpt);		
+		if(employeeOpt.isPresent()) {
+			employeeMap.put(employee.getEmployeeId(), employeeOpt.get());
+		}
 		
-		return employeeMap.get(employee.getEmployeeId());
+		return employeeOpt;
 	}
 
 	@Override
-	public void deleteById(String employeeId) {
-		employeeMap.get(employeeId).ifPresent(emp -> employeeMap.remove(employeeId));		
+	public boolean deleteById(String employeeId) {
+		if(employeeMap.containsKey(employeeId)) {
+			employeeMap.remove(employeeId);
+			return true;
+		}
+		return false;		
 	}
 	
 	protected void deleteAll() {

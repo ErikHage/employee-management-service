@@ -14,11 +14,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.ehage.ems.dao.EmployeeDao;
-import com.ehage.ems.exception.NoSuchRecordException;
+import com.ehage.ems.exception.PersistenceException;
 import com.ehage.ems.helper.EMSTestHelper;
 import com.ehage.ems.model.Employee;
 import com.ehage.ems.service.EmployeeServiceImpl;
-
 
 public class TestEmployeeServiceImpl {
 
@@ -61,19 +60,16 @@ public class TestEmployeeServiceImpl {
 		verifyNoMoreInteractions(mockDao);
 	}
 	
-	@Test(expected=NoSuchRecordException.class)
+	@Test(expected=PersistenceException.class)
 	public void testReadOneThrowNoSuchRecordException() {
 		Employee emp1 = EMSTestHelper.getEmployee("T1");
 		emp1.setRecordVersion(1);
 		
-		when(mockDao.readById("T1")).thenThrow(new NoSuchRecordException("No record found with id = 1", "T1"));
+		when(mockDao.readById("T1")).thenThrow(new PersistenceException("No record found with id = 1", "T1"));
 		
 		employeeService.readOne("T1");
-		
-		fail("Expected NoSuchRecordException, but wasn't thrown");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testReadAll() {
 		Employee emp1 = EMSTestHelper.getEmployee("T1");
@@ -81,8 +77,8 @@ public class TestEmployeeServiceImpl {
 		Employee emp2 = EMSTestHelper.getEmployee("T2");
 		emp2.setRecordVersion(1);
 		
-		List<Optional<Employee>> list = 
-				Arrays.asList(new Optional[] {Optional.of(emp1), Optional.of(emp2)});
+		List<Employee> list = 
+				Arrays.asList(new Employee[] {emp1, emp2});
 		
 		when(mockDao.readAll()).thenReturn(list);
 		
@@ -109,22 +105,30 @@ public class TestEmployeeServiceImpl {
 		verifyNoMoreInteractions(mockDao);
 	}
 
-	@Test(expected=NoSuchRecordException.class)
+	@Test(expected=PersistenceException.class)
 	public void testUpdateThrowNoSuchRecordException() {
 		Employee emp1 = EMSTestHelper.getEmployee("T1");
 		emp1.setRecordVersion(1);
 		
-		when(mockDao.update(emp1)).thenThrow(new NoSuchRecordException("No record found with id = 1", "T1"));
+		when(mockDao.update(emp1)).thenThrow(new PersistenceException("No record found with id = 1", "T1"));
 		
 		employeeService.update(emp1);
-		
-		fail("Expected NoSuchRecordException, but wasn't thrown");
 	}
 	
 	@Test
 	public void testDeleteById() {
-		employeeService.deleteById("T1");		
-
+		when(mockDao.deleteById("T1")).thenReturn(true);		
+		assertTrue(employeeService.deleteById("T1"));	
+		
+		verify(mockDao, times(1)).deleteById("T1");
+		verifyNoMoreInteractions(mockDao);
+	}
+	
+	@Test(expected=PersistenceException.class)
+	public void testDeleteById_ExpectException() {
+		when(mockDao.deleteById("T1")).thenReturn(false);		
+		assertTrue(employeeService.deleteById("T1"));	
+		
 		verify(mockDao, times(1)).deleteById("T1");
 		verifyNoMoreInteractions(mockDao);
 	}

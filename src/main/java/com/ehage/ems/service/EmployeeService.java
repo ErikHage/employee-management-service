@@ -10,6 +10,6 @@ public interface EmployeeService {
 	public Employee readOne(String employeeId);
 	public List<Employee> readAll();
 	public Employee update(Employee employee);
-	public void deleteById(String employeeId);
+	public boolean deleteById(String employeeId);
 	
 }
